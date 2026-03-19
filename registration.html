@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registration - DADU System</title>
+    <link rel="stylesheet" href="navigation.css">
+    <link rel="stylesheet" href="regstr.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .error { 
+            display:none; 
+            color:rgb(0, 255, 195); 
+            font-size:13px; 
+        }
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="about.html" class="logo">DADU System</a>
+            <ul class="nav-menu">
+                <li><a href="about.html">About</a></li>
+                <li><a href="system.html">System</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="registration.html" class="active">Register</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+            <button class="nav-toggle">☰</button>
+        </div>
+    </nav>
+    <section id="regSection">
+        <?php
+        session_start();
+        $errors = $_SESSION['errors'] ?? [];
+        $form_data = $_SESSION['form_data'] ?? [];
+        $success = $_SESSION['success'] ?? '';
+        unset($_SESSION['errors'], $_SESSION['form_data'], $_SESSION['success']);
+        ?>
+        
+        <?php if (!empty($errors)): ?>
+            <div style="background: #f8d7da; color: #721c24; padding: 15px; margin: 20px auto; max-width: 1100px; border-radius: 5px;">
+                <ul style="margin: 0; padding-left: 20px;">
+                    <?php foreach ($errors as $error): ?>
+                        <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($success): ?>
+            <div style="background: #d4edda; color: #155724; padding: 15px; margin: 20px auto; max-width: 1100px; border-radius: 5px; text-align: center;">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+        <?php endif; ?>
+        
+        <form action="process.php" method="post" onsubmit="return validateForm()" id="registrationForm">
+            <fieldset style="padding:20px;margin:0px;">
+                <!-- University -->
+                <div class="form-group">
+                    <label>University Name</label>
+                    <input type="text" name="university_name" value="DADU" readonly>
+                </div>
+
+                <!-- User ID -->
+                <div class="form-group">
+                    <label class="required">user_id</label>
+                    <input type="text" id="user_id" name="user_id" required>
+                    <div class="error" id="userIdError">Please enter your ID</div>
+                </div>
+
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label class="required">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" maxlength="30" required>
+                    <div class="error" id="fullNameError">Please enter your full name</div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label class="required">E-Mail</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="error" id="emailError">Please enter your email</div>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label class="required">Mobile Phone</label>
+                    <input type="tel" id="phone" name="phone"
+                           placeholder="+2519XXXXXXXX"
+                           pattern="^\+2519[0-9]{8}$"
+                           maxlength="13" minlength="13" required>
+                </div>
+
+                <!-- Sex -->
+                <div class="form-group">
+                    <label class="required">Sex</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="sex" value="male"> Male</label>
+                        <label><input type="radio" name="sex" value="female"> Female</label>
+                    </div>
+                    <div class="error" id="sexError">Please select your sex</div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label class="required">Password</label>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           maxlength="64"
+                           minlength="8"
+                           required>
+                    <div class="error" id="passwordError">Password must be strong</div>
+                    <span onclick="togglePassword()" style="cursor:pointer;">Show / Hide Password</span>
+                </div>
+
+                <!-- Role -->
+                <div class="form-group">
+                    <label class="required">Role</label>
+                    <select name="role" id="role" required>
+                        <option value="">-- Select Role --</option>
+                        <option value="student">Student</option>
+                        <option value="instructor">Instructor</option>
+                        <option value="department">Department</option>
+                        <option value="college">College</option>
+                        <option value="admin">Admin</option>
+                        <option value="it_expert">IT Expert</option>
+                    </select>
+                </div>
+
+                <!-- College -->
+                <div class="form-group">
+                    <label class="required">College</label>
+                    <select id="college" name="college_id" required>
+                        <option value="1">College of Engineering</option>
+                    </select>
+                </div>
+
+                <!-- Department -->
+                <div class="form-group">
+                    <label class="required">Department</label>
+                    <select id="department" name="department_id" required>
+                        <option value="">-- Select Department --</option>
+                        <option value="1">Software Engineering</option>
+                        <option value="2">Computer Science</option>
+                        <option value="3">Electrical and Computer Engineering</option>
+                        <option value="4">Information Technology</option>
+                        <option value="5">Urban Planning</option>
+                        <option value="6">Architecture</option>
+                        <option value="7">Civil Engineering</option>
+                        <option value="8">Hydraulic Engineering</option>
+                        <option value="9">Mechanical Engineering</option>
+                    </select>
+                    <div class="error" id="departmentError">Please select department</div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="button" id="loginBtn">Log In</button>
+                    <button type="submit" id="submitBtn">Submit</button>
+                    <button type="reset" id="clearBtn">Clear</button>
+                </div>
+            </fieldset>
+        </form>
+    </section>
+
+    <script>
+        const userIdField = document.getElementById("user_id");
+        const fullNameField = document.getElementById("full_name");
+        const emailField = document.getElementById("email");
+        const passwordField = document.getElementById("password");
+        const departmentField = document.getElementById("department");
+        const userIdError = document.getElementById("userIdError");
+        const fullNameError = document.getElementById("fullNameError");
+        const emailError = document.getElementById("emailError");
+        const sexError = document.getElementById("sexError");
+        const passwordError = document.getElementById("passwordError");
+        const departmentError = document.getElementById("departmentError");
+
+        function togglePassword() {
+            passwordField.type = passwordField.type === "password" ? "text" : "password";
+        }
+
+        function validateForm() {
+            let valid = true;
+            document.querySelectorAll(".error").forEach(e => e.style.display = "none");
+
+            if (userIdField.value.trim() === "") {
+                userIdError.style.display = "block";
+                valid = false;
+            }
+
+            if (fullNameField.value.trim() === "") {
+                fullNameError.style.display = "block";
+                valid = false;
+            }
+
+            if (emailField.value.trim() === "") {
+                emailError.style.display = "block";
+                valid = false;
+            }
+
+            if (!document.querySelector('input[name="sex"]:checked')) {
+                sexError.style.display = "block";
+                valid = false;
+            }
+
+            if (passwordField.value.length < 8) {
+                passwordError.style.display = "block";
+                valid = false;
+            }
+
+            if (departmentField.value === "") {
+                departmentError.style.display = "block";
+                valid = false;
+            }
+
+            return valid;
+        }
+
+        $('#college').change(function () {
+            let collegeID = $(this).val();
+            if (collegeID) {
+                $.post('fetch_data.php', { college_id: collegeID }, function (data) {
+                    $('#department').html(data);
+                });
+            }
+        });
+
+        $('#loginBtn').click(function () {
+            window.location.href = "login.html";
+        });
+        
+        // Mobile menu toggle
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+        
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
